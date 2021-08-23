@@ -36,7 +36,7 @@ class Diversao(commands.Cog):
                 numbr = random.randint(1, 20)
                 fil = discord.File('./assets/gifs/hugs/hug{}.gif'.format(numbr), filename='hug{}.gif'.format(numbr))
                 embd = discord.Embed(color=0x030058)
-                embd.add_field(name='💖 ABRAÇO!', value=f'{ctx.author.mention} envolveu {member.mention} em um abraço!')
+                embd.add_field(name='💖 ABRAÇO!', value=f'{member.mention} envolveu {ctx.author.mention} em um abraço!')
                 embd.set_image(url='attachment://hug{}.gif'.format(numbr))
                 await ctx.send(file=fil, embed=embd)
 

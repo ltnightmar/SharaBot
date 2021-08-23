@@ -1,5 +1,6 @@
 import discord
 import asyncio
+import json
 import datetime
 from discord.ext import commands
 
@@ -8,7 +9,7 @@ class Infos(commands.Cog):
     def __init__(self, client):
         self.author = None
         self.client = client
-
+    
     @commands.command(aliases=['usericon'])
     async def avatar(self, ctx, *, member: discord.Member = None):
         if member is None:
@@ -90,28 +91,24 @@ class Infos(commands.Cog):
     @commands.command()
     async def ping(self, ctx):
         await ctx.send(f'🏓 **Pong!** | Latência: `{round(self.client.latency * 1000)}ms`')
+    
+    @commands.command(aliases=['server', 'guild'])
+    async def servidor(self, ctx):
+        embed = discord.Embed(title=f'Entre em meus servidores!', colour=0x030058, timestamp=ctx.message.created_at)
+        embed.add_field(name='Gostaria de entrar em meus servidores? Acesse os links abaixo:',
+                        value='⠀\n<:coracao:850021677396000779> Nightmare: https://discord.gg/nnightmare\n\nCaso queira'
+                              ' reportar um bug ou dar alguma sugestão, entre em contato com minha criadora nesse '
+                              'servidor.\n\n**Criadora: **<@842741926071762944>')
+        embed.set_footer(icon_url=ctx.author.avatar_url, text=f'{ctx.author}')
+        await ctx.send(f'{ctx.author.mention}', embed=embed)
 
     @commands.command(aliases=['créditos'])
     async def creditos(self, ctx):
         embed = discord.Embed(colour=0x030058, timestamp=ctx.message.created_at)
-        embed.add_field(name='Créditos', value='Programado pela <@842741926071762944>\nLinguagem utilizada: `Python`\nAinda em desenvolvimento!\nPara sugestões, entre no nosso [servidor](https://discord.gg/2Kc5Svk2pj)!')
+        embed.add_field(name='Créditos', value='Programado pela <@842741926071762944>\nLinguagem utilizada: `Python`\nAinda em desenvolvimento!\nPara sugestões, entre no nosso [servidor](https://discord.gg/nnightmare)!')
         embed.set_footer(icon_url=ctx.author.avatar_url, text=f'{ctx.author}')
         await ctx.send(f'{ctx.author.mention}', embed=embed)
-
-    @commands.command(aliases=['servers', 'guilds', 'servidor', 'server', 'guild'])
-    async def servidores(self, ctx):
-        with open('servidores.jpg', 'rb') as f:
-            picture = discord.File(f)
-        embed = discord.Embed(title=f'Entre em meus servidores!', colour=0x030058, timestamp=ctx.message.created_at)
-        embed.add_field(name='Gostaria de entrar em meus servidores? Acesse os links abaixo:',
-                        value='⠀\n<:coracao:850021677396000779> Nightmare: https://discord.gg/ntm\n'
-                              '<:coracao:850021677396000779> Otaku World: https://discord.gg/Q28rPCvt34\n\nCaso queira'
-                              ' reportar um bug ou dar alguma sugestão, entre em contato com minha criadora nesses '
-                              'servidores.\n\n**Criadora: **<@842741926071762944>')
-        embed.set_image(url='attachment://servidores.jpg')
-        embed.set_footer(icon_url=ctx.author.avatar_url, text=f'{ctx.author}')
-        await ctx.send(f'{ctx.author.mention}', file=picture, embed=embed)
- 
+        
     @commands.command()
     async def uptime(self, ctx):
         delta_uptime = datetime.datetime.utcnow() - self.client.launch_time
@@ -124,7 +121,7 @@ class Infos(commands.Cog):
         e.set_footer(icon_url=ctx.author.avatar_url, text=f'{ctx.author}')
         e.set_thumbnail(url='attachment://clock.gif')
         await ctx.send(f'{ctx.author.mention}', file=file, embed=e)
-
+    
 
 def setup(client):
     client.add_cog(Infos(client))

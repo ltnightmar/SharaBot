@@ -1,49 +1,65 @@
 import os
-import asyncio
-import random
+import json
 import discord
+import random
+import asyncio
 import datetime
 from discord.ext import commands
 from webserver import keep_alive
 
-intents = discord.Intents(messages=True, guilds=True)
-intents.members = True
-intents.change_presence = True
-client = discord.Client(command_prefix='>', intents=intents)
+
+def get_prefix(client, message):
+	if not message.guild:
+		return commands.when_mentioned_or('#')(client, message)
+	with open('./databases/prefixes.json', 'r') as f:
+		prefixes = json.load(f)
+	if str(message.guild.id) not in prefixes:
+		return commands.when_mentioned_or('#')(client, message)
+
+	prefix = prefixes[str(message.guild.id)]
+	return commands.when_mentioned_or(prefix)(client, message)
+
+
+intents = discord.Intents.all()
+client = commands.Bot(command_prefix=get_prefix, intents=intents)
 client.remove_command('help')
 client.launch_time = datetime.datetime.utcnow()
+
 
 @client.event
 async def on_ready():
 
-    await client.change_presence(activity=discord.Game(name=f"Online em {len(client.guilds)} servidores"))
-    await client.change_presence(activity=discord.Game(name=f"Escreva #help para mais comandos"))
-    await client.change_presence(activity=discord.Game(name=f"Entre no meu servidor: https://discord.gg/ntm"))
-    await client.change_presence(activity=discord.Game(name=f"Minha criadora: Lilithⁿᵗᵐ#0666"))
+	print('Sim, to online de novo')
 
-    print('A mãe tá on')
+async def ch_pr():
+
+	await client.wait_until_ready()
+
+	statuses = [
+	    f'Online em {len(client.guilds)} servidores | #help',
+	    'Minha criadora: Lilithⁿᵗᵐ#0666 | #help',
+	    'Entre no meu servidor: https://discord.gg/nnightmare | #help',
+        f'Cuidando de {len(client.users)} membros']
+
+	while not client.is_closed():
+
+		status = random.choice(statuses)
+
+		await client.change_presence(activity=discord.Game(name=status))
+
+		await asyncio.sleep(3)
 
 
-async def change_presence():
-    await client.wait_until_ready()
+client.loop.create_task(ch_pr())
 
-    statuses = [f"Cuidando de {len(client.guilds)} servidores", f"Escreva #help para mais comandos",
-                f"Entre no meu servidor: https://discord.gg/ntm", "Minha criadora: Lilithⁿᵗᵐ#0666"]
-
-    while not client.is_closed():
-
-        status = random.choice(statuses)
-
-        await client.change_presence(activity=discord.Game(name=status))
-
-        await asyncio.sleep(2)
-
-    client.loop.create_task(change_presence())
-
+@client.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        return await ctx.send(f'<:nao:850020125927276641> {ctx.author.mention}| Comando inexistente! Use o comando help para saber meus comandos!')
 
 for filename in os.listdir('comandos'):
-    if filename.endswith('.py'):
-        client.load_extension(f'comandos.{filename[:-3]}')
+	if filename.endswith('.py'):
+		client.load_extension(f'comandos.{filename[:-3]}')
 
 keep_alive()
 TOKEN = os.environ['TOKEN']
