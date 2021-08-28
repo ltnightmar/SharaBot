@@ -53,6 +53,12 @@ async def ch_pr():
 client.loop.create_task(ch_pr())
 
 @client.event
+async def on_message(message):
+    if not message.author.bot:
+        if 'bolo' in message.content:
+            await message.channel.send(f'{message.author.mention} Um bolo para você! 🍰')
+
+@client.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
         return await ctx.send(f'<:nao:850020125927276641> {ctx.author.mention}| Comando inexistente! Use o comando help para saber meus comandos!')
