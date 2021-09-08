@@ -25,47 +25,65 @@ client = commands.Bot(command_prefix=get_prefix, intents=intents)
 client.remove_command('help')
 client.launch_time = datetime.datetime.utcnow()
 
+@client.event
+async def on_guild_join(guild):
+    with open ("./databases/prefixes.json", "r") as f:
+        prefixes = json.load(f)
+        prefixes[str(guild.id)] = "#"
+    with open ("./databases/prefixes.json", "w") as f:
+        json.dump(prefixes, f, indent=4)
+
+@client.event
+async def on_guild_channel_delete(channel):
+	with open('./databases/global_chat.json', 'r') as file:
+		global_chat_data = json.load(file)
+		channel_data = global_chat_data[str(channel.guild.id)]
+		for key, value in global_chat_data.items():
+			if channel_data == value:
+				global_chat_data.pop(str(channel.guild.id))
+				with open('./databases/global_chat.json', 'w') as update_global_chat_file:
+					json.dump(global_chat_data, update_global_chat_file, indent=4)
+				
+
+@client.event
+async def on_guild_remove(guild):
+	with open('./databases/prefixes.json', 'r') as file:
+		prefixes_data = json.load(file)
+	prefixes_data.pop(str(guild.id))
+	with open('./databases/prefixes.json', 'w') as update_prefixes_file:
+		json.dump(prefixes_data, update_prefixes_file, indent=4)
+	with open('./databases/global_chat.json', 'r') as file:
+		global_chat_data = json.load(file)
+		new_global_chat = str(guild.id)
+		if new_global_chat in global_chat_data: 
+			global_chat_data.pop(str(guild.id))
+			with open('./databases/global_chat.json', 'w') as update_global_chat_file:
+				json.dump(global_chat_data, update_global_chat_file, indent=4)
+
 
 @client.event
 async def on_ready():
-
 	print('Sim, to online de novo')
 
 async def ch_pr():
-
 	await client.wait_until_ready()
-
 	statuses = [
-	    f'Online em {len(client.guilds)} servidores | #help',
-	    'Minha criadora: Lilithⁿᵗᵐ#0666 | #help',
-	    'Entre no meu servidor: https://discord.gg/nnightmare | #help',
+	    f'Online em {len(client.guilds)} servidores',
+	    'Minha criadora: Queen of Darkness#0666',
+	    'Entre no meu servidor: https://discord.gg/5a87Afucne',
         f'Cuidando de {len(client.users)} membros']
 
 	while not client.is_closed():
-
 		status = random.choice(statuses)
-
 		await client.change_presence(activity=discord.Game(name=status))
-
 		await asyncio.sleep(3)
 
-
 client.loop.create_task(ch_pr())
-
-@client.event
-async def on_message(message):
-    if not message.author.bot:
-        if 'bolo' in message.content:
-            await message.channel.send(f'{message.author.mention} Um bolo para você! 🍰')
-
-@client.event
-async def on_command_error(ctx, error):
-    if isinstance(error, commands.CommandNotFound):
-        return await ctx.send(f'<:nao:850020125927276641> {ctx.author.mention}| Comando inexistente! Use o comando help para saber meus comandos!')
 
 for filename in os.listdir('comandos'):
 	if filename.endswith('.py'):
 		client.load_extension(f'comandos.{filename[:-3]}')
+
 
 keep_alive()
 TOKEN = os.environ['TOKEN']
