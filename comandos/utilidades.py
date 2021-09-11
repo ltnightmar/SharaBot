@@ -81,25 +81,55 @@ class Utilidades(commands.Cog):
                 channel_id = list(global_chat_data.values())
 
                 urls = regex.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',message.content.lower())
-                if urls and message.channel.id in channel_id:
-                    return await self.client.channel.send('A mensagem contém um link, portanto não foi enviada no chat global!')
-                if message.content.startswith('discord.gg/'):
-                    return await self.client.channel.send('A mensagem contém um convite de servidor, portanto não foi enviada no chat global!')
-                if message.content.startswith('dc.gg/'):
-                    return await self.client.channel.send('A mensagem contém um convite de servidor, portanto não foi enviada no chat global!')
                 if message.channel.id in channel_id:
-                    if not message.content:
-                        message.content = 'ㅤ'
-
                     for ids in channel_id:
                         if message.channel.id != ids:
+                            if message.author.id == 842741926071762944:
+                                pass
+                            else:
+                                if urls and message.channel.id in channel_id:
+                                    return await self.client.get_channel(message.channel.id).send(f'{message.author.mention} A mensagem contém um link, portanto não foi enviada no chat global!')
+                                if 'discord.gg/' in message.content:
+                                    return await self.client.get_channel(message.channel.id).send(f'{message.author.mention} A mensagem contém um convite de servidor, portanto não foi enviada no chat global!')
+                                if 'dc.gg/' in message.content:
+                                    return await self.client.get_channel(message.channel.id).send(f'{message.author.mention} A mensagem contém um convite de servidor, portanto não foi enviada no chat global!')
+                                if '@everyone' in message.content:
+                                    return await self.client.get_channel(message.channel.id).send(f'{message.author.mention} A mensagem contém uma menção global, então não foi enviada no chat global!')
+                                if '@here' in message.content:
+                                    return await self.client.get_channel(message.channel.id).send(f'{message.author.mention} A mensagem contém uma menção global, então não foi enviada no chat global!')
                             tchannel = self.client.get_channel(ids)
                             webhooks = await tchannel.webhooks()
                             webhook = utils.get(webhooks, name='Chat Global')
                             if webhook is None:
                                 webhook = await tchannel.create_webhook(name='Chat Global')
-                            await webhook.send(content=message.content, username=message.author.name, avatar_url=message.author.avatar_url)
-    
+                            
+                            if message.reference is not None:
+                                if message.attachments:
+                                    embed = discord.Embed()
+                                    embed.set_image(url=message.attachments[0].url)
+                                    msg = await message.channel.fetch_message(message.reference.message_id)
+                                    author = msg.author.name
+                                    if not message.content:
+                                        await webhook.send(content=f'> {msg.content}\n**@{author}**', username=message.author.name, avatar_url=message.author.avatar_url, embed=embed)
+                                    else:
+                                        await webhook.send(content=f'> {msg.content}\n**@{author}** {message.content}', username=message.author.name, avatar_url=message.author.avatar_url, embed=embed)
+                                else:
+                                    msg = await message.channel.fetch_message(message.reference.message_id)
+                                    author = msg.author.name
+                                    await webhook.send(content=f'> {msg.content}\n**@{author}** {message.content}', username=message.author.name, avatar_url=message.author.avatar_url)
+
+                            elif message.reference is None:
+                                if message.attachments:
+                                    embed = discord.Embed()
+                                    embed.set_image(url=message.attachments[0].url)
+                                    if not message.content:
+                                        message.content = f'Mídia de **{message.author.name}**'
+                                        await webhook.send(content=f'{message.content}', username=message.author.name, avatar_url=message.author.avatar_url, embed=embed)
+                                    else:
+                                        await webhook.send(content=f'{message.content}', username=message.author.name, avatar_url=message.author.avatar_url, embed=embed)
+                                else:
+                                    await webhook.send(content=f'{message.content}', username=message.author.name, avatar_url=message.author.avatar_url)                         
+
     @commands.command(aliases=['em'])
     async def embed(self, ctx):
         try: 
