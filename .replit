@@ -1,0 +1,11 @@
+language="python3"
+run = """
+pip uninstall discord
+pip uninstall discord.py
+pip install -U git+https://github.com/Pycord-Development/pycord
+pip install git+https://github.com/Pycord-Development/pycord@feature/slash
+python main.py
+"""
+
+[packager]
+ignoredPackages=["discord.py", "discord"]
