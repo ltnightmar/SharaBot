@@ -15,7 +15,7 @@ class Utilidades(commands.Cog):
         self.client = client
         
  
-    @slash_command(guild_ids =  utils.save.ides, description='〘 🛠️  Utilidades 〙Envia uma mensagem especificada pelo usuário')
+    @slash_command(description='〘 🛠️  Utilidades 〙Envia uma mensagem especificada pelo usuário')
     async def falar(self, ctx, 
                     mensagem: Option(str, description='Mensagem que deseja enviar', required=True, default=True),
                     membro: Option(discord.Member, description='Usuário pra quem deseja enviar a mensagem', required=False, default=None)):
@@ -24,7 +24,7 @@ class Utilidades(commands.Cog):
         else:
             await ctx.respond(f'**@{ctx.author.name}** Disse para {membro.mention}:\n`{mensagem}`')
     
-    @slash_command(guild_ids = utils.save.ides, description='〘 🛠️  Utilidades 〙Cria uma embed personalizada')
+    @slash_command(description='〘 🛠️  Utilidades 〙Cria uma embed personalizada')
     async def embed(self, ctx):
         await ctx.defer()
         try: 
@@ -153,7 +153,7 @@ class Utilidades(commands.Cog):
             await msg.add_reaction(utils.save.n)
                 
 
-    @slash_command(guild_ids = utils.save.ides, description='〘 🛠️  Utilidades 〙Ativa o chat global no seu servidor')
+    @slash_command(description='〘 🛠️  Utilidades 〙Ativa o chat global no seu servidor')
     async def chatglobal_start(self, ctx, 
                     channel: Option(discord.TextChannel, description='Chat que deseja ativar o chat global', required=True, default=True)):
         await ctx.defer()
