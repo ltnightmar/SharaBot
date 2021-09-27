@@ -31,6 +31,10 @@ async def on_guild_remove(guild):
 					json.dump(global_chat_data, update_global_chat_file, indent=4)
 
 @client.event
+async def on_command_error(ctx, error):
+    pass
+
+@client.event
 async def on_ready():
 	print(f'{client.user} online!')
 async def ch_pr():
